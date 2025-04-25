@@ -664,6 +664,10 @@ async def async_unequipJobItem():
 		await async_task_with_sleep(30)
 
 async def async_autostyria_prepare():
+
+	global glb_training_profile
+	glb_training_profile = get_profile()
+	
 	#try stopping bot
 	success = await async_stop_bot()
 
@@ -891,10 +895,6 @@ def autostyria_complete():
 	thread.start()
 	LogMsg("Completion tasks are running in background thread! Please dont do anything till tasks are complete")
 
-def StoreTrainingProfile():
-	global glb_training_profile
-	glb_training_profile = get_profile()
-
 def UnequipItem(item):
 	# find an empty slot
 	slot = GetEmptySlot()
@@ -1074,9 +1074,6 @@ def LoadConfig():
 				data = {}
 				with open(config,"r") as f:
 					data = json.load(f)
-
-				if(glb_training_profile is None):
-					StoreTrainingProfile()
 
 				# Basic fields
 				QtBind.setChecked(gui, gui_disable_plugin_chkBox, data.get('DisablePlugin', False))
