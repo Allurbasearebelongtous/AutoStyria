@@ -481,6 +481,10 @@ def generate_autostyria_conditions():
 	original_data["Conditions"].append(prep_condition_day2)
 	LogMsg(f"preparation condition for styria day 2 added in to profile {glb_training_profile}")
 
+	# Replace the conditions with an empty one if it exists. this ensures no conditions are passed from copied json profile.
+	if "Conditions" in modified_data and isinstance(modified_data["Conditions"], list):
+		modified_data["Conditions"] = []  # remove all the conditions!
+
 	# Set all boolean entries under "Loop" to False, this ensures no issues with scripts or unnessary returns while we waiting for registry.
 	loop_data = modified_data.get("Loop", {})
 	for key, value in loop_data.items():
@@ -493,6 +497,7 @@ def generate_autostyria_conditions():
 		if isinstance(value, bool):  # Check if the value is a boolean
 			modified_data["Party"][key] = False
 
+	#add the only conditions we need!
 	modified_data["Conditions"].append(entry_condition_day1)
 	LogMsg("register condition for styria day 1 added in to profile " + pName)
 	modified_data["Conditions"].append(entry_condition_day2)
@@ -667,7 +672,7 @@ async def async_autostyria_prepare():
 
 	global glb_training_profile
 	glb_training_profile = get_profile()
-	
+	LogMsg(f"storing default profile {glb_training_profile} to be recovered later")	
 	#try stopping bot
 	success = await async_stop_bot()
 
