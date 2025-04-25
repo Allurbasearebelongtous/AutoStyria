@@ -1020,8 +1020,7 @@ def teleported():
 			if(not glb_styria_started): #check on each teleportation to see if we are in styria region.
 				region_enum = REGION(region)
 				try:
-					#if region_enum  in {REGION.STYRIA_A1, REGION.STYRIA_A2, REGION.STYRIA_B1, REGION.STYRIA_B2}:
-					if region_enum  in {REGION.HOTAN_TOWN}:
+					if region_enum  in {REGION.STYRIA_A1, REGION.STYRIA_A2, REGION.STYRIA_B1, REGION.STYRIA_B2}:
 						LogMsg("Styria region detected! more likely we are in styria world!")
 						glb_styria_started = True
 				except ValueError:
@@ -1030,8 +1029,7 @@ def teleported():
 			else: #check on each teleportation to see if we are out of styria region.
 				region_enum = REGION(region)
 				try:
-					#if region_enum not in {REGION.STYRIA_A1, REGION.STYRIA_A2, REGION.STYRIA_B1, REGION.STYRIA_B2}:
-					if region_enum  not in {REGION.HOTAN_TOWN}:
+					if region_enum not in {REGION.STYRIA_A1, REGION.STYRIA_A2, REGION.STYRIA_B1, REGION.STYRIA_B2}:
 						autostyria_complete() #we are out! styria must be complete!
 						glb_styria_started = False
 				except ValueError:
