@@ -12,15 +12,16 @@ import struct
 import random
 import json
 import os
+import webbrowser
 from binascii import hexlify  # for debugging
 
 pName = 'AutoStyria'
 logPrefix = pName + '-plugin: '
 pVersion = '1.0.0'
-pUrl = ''
-
+pUrl = 'https://github.com/Allurbasearebelongtous/AutoStyria'
+pUrlEnglish = 'https://github.com/Allurbasearebelongtous/AutoStyria/wiki'
+pUrlTurkish = 'https://github.com/Allurbasearebelongtous/AutoStyria/wiki/Acilis-sayfasi'
 glb_char_data = None
-glb_server_name = None
 glb_training_profile = None
 glb_registered_for_styria = False
 glb_styria_started = False
@@ -173,6 +174,11 @@ gui_day_sun_y = gui_day_sat_y + gui_checkbox_padding_y
 QtBind.createLabel(gui,'AutoStyria plugin handles your char to return town, leave party, equip job item and walked to Arena NPC and register to styria!',10, 20)
 QtBind.createLabel(gui,'Once styria ends,the plugin unequips job item (if required), disconnect (to recover shard fatigue) or change back to your profile to continue botting',10, 40)
 
+QtBind.createLabel(gui, 'Information Page (Bilgi Sayfasi)',  10, 70)
+gui_guideEng = QtBind.createButton(gui,'OpenGuidePageEng',"English!",10,85)
+gui_guideTurkish = QtBind.createButton(gui,'OpenGuidePageTurkish',"Turkish",85,85)
+
+
 gui_ignore_unequip_jobItem_chkBox = QtBind.createCheckBox(gui, 'cbxAuto_clicked','ignore unequpping job item ', gui_ignore_unequip_x, gui_ignore_unequip_y)
 gui_disable_plugin_chkBox = QtBind.createCheckBox(gui, 'cbxAuto_clicked','disable plugin ', gui_disable_x, gui_disable_y)
 gui_allow_disconnect_chkBox = QtBind.createCheckBox(gui, 'cbxAuto_clicked','disconnect after styria complete ', gui_allow_disconnect_x, gui_allow_disconnect_y)
@@ -232,6 +238,11 @@ glb_checkbox_by_day2 = {
 def LogMsg(logstr):
 	log(logPrefix + logstr)
 
+def OpenGuidePageEng():
+	webbrowser.open(pUrlEnglish)
+
+def OpenGuidePageTurkish():
+	webbrowser.open(pUrlTurkish)
 #_______________________________Gui methods__________________________________#
 
 #sadly, callback returns true or false and not the insance of the checkbox hence we need to create this gazillion callbacks.
