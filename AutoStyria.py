@@ -1048,19 +1048,19 @@ def teleported():
 					LogMsg(f"while in styria unknown styria or town region ID {region} detected during teleport! More likely you manually quit the Styria! or your bot is using return scroll for some reason!")
 
 def finished():
-
 	LogMsg("#signal the background thread to finish.")
 	glb_stop_event.set()
 
 #______________________________config methods________________________________#
 
 def CharInGame():
-	global character_data
+	global glb_char_data
+	character_data = get_character_data()
 	if(character_data is None): #only update if the character data is none.
 		LogMsg("char data doesn't exist! trying to retrive from bot")
-		character_data = get_character_data()
 		if not (character_data and "name" in character_data and character_data["name"]):
 			character_data = None
+		glb_char_data = character_data
 	return character_data
 
 def getPath():
