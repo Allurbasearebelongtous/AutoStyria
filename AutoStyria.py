@@ -171,7 +171,7 @@ gui_day_fri_y = gui_day_thu_y + gui_checkbox_padding_y
 gui_day_sat_y = gui_day_fri_y + gui_checkbox_padding_y
 gui_day_sun_y = gui_day_sat_y + gui_checkbox_padding_y
 
-QtBind.createLabel(gui,'AutoStyria plugin handles your char to return town, leave party, equip job item and walked to Arena NPC and register to styria!',10, 20)
+QtBind.createLabel(gui,'AutoStyria plugin handles your char to return town, leave party, equip job item and walk to Arena NPC and register to styria!',10, 20)
 QtBind.createLabel(gui,'Once styria ends,the plugin unequips job item (if required), disconnect (to recover shard fatigue) or change back to your profile to continue botting',10, 40)
 
 QtBind.createLabel(gui, 'Information Page (Bilgi Sayfasi)',  10, 70)
@@ -383,11 +383,8 @@ def get_selected_day(checkbox_by_day):
 #or if there is not enough time to prepare before the registration time.
 #this function handles these edge cases to ensure there is always enough time for preperations!
 def update_registration_time_conditions(conditions, start_delay_minutes=5):
-	
-	LogMsg("test")
 	now_struct = time.localtime()
 	now_minutes = now_struct.tm_hour * 60 + now_struct.tm_min
-	LogMsg("test2")
 	# Read threshold from GUI and convert to minutes
 	threshold_str = QtBind.text(gui, gui_registerTimeLine)
 	threshold_struct = time.strptime(threshold_str, "%H:%M")
@@ -662,7 +659,6 @@ async def async_register_styria():
 		return False
 	
 async def async_equipJobItemIfExist():
-	LogMsg("Itest1")
 	jobItemEquipped = equipJobItemIfExist()
 	await async_task_with_sleep(1)
 	if(jobItemEquipped == JobItemStatus.NOT_EQUIPPED):
@@ -1082,7 +1078,6 @@ def getConfig():
 
 # Load config if exists
 def LoadConfig():
-	LogMsg("loading config")
 	if(CharInGame):
 		if not os.path.exists(getPath()):
 			os.makedirs(getPath())
