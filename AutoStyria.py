@@ -569,6 +569,24 @@ def generate_autostyria_conditions():
 	Timer(1.0, set_profile, [glb_training_profile]).start() #wait than swap the profile.
 
 #_______________________________Async methods________________________#
+
+async def async_Load_config_when_chardata_ready():
+	char_data =  CharInGame()
+	max_tries = 5
+	tries = 0
+
+	#loop untill the condition is met or tries exceeds the max_tries
+	while glb_char_data is None and tries < max_tries:
+		CharInGame()
+		LogMsg("waiting for char data to become available")
+		await async_task_with_sleep(1)
+		tries += 1
+	
+	if(glb_char_data is None):
+		LogMsg("❌ its taking too long to retrieve char data! cannot proceed with config load")
+	else:
+		LoadConfig()
+
 async def async_check_stop_event():
     """Async-friendly stop event checker."""
     if glb_stop_event.is_set():
@@ -870,8 +888,18 @@ def run_async_autostyria(arguments):
 	prepare = "Prepare" in arguments
 	register = "Register" in arguments
 	complete = "Complete" in arguments
+	load = "Load" in arguments
 	global glb_thread_started
-	if(prepare):
+	if(load):
+		try:
+			asyncio.run(async_Load_config_when_chardata_ready())
+		except Exception as e:
+			LogMsg(f"Error in async_Load_config_when_chardata_ready: {e}")
+		finally:
+			LogMsg("Background task finished")
+			with glb_thread_lock:
+				glb_thread_started = False
+	elif(prepare):
 		try:
 			asyncio.run(async_autostyria_prepare())
 		except Exception as e:
@@ -949,6 +977,19 @@ def autostyria_complete():
 	thread.daemon = False  # Non-daemon thread
 	thread.start()
 	LogMsg("Completion tasks are running in background thread! Please dont do anything till tasks are complete")
+
+def load_char_data_inbackground():
+	global glb_thread_started
+	with glb_thread_lock:
+		if (glb_thread_started):
+			return 0
+		glb_thread_started = True
+	arguments = ["Load"]
+	LogMsg("Create and start a non-daemon background thread for configration to load")
+	thread = Thread(target=run_async_autostyria, args=(arguments,))
+	thread.daemon = False  # Non-daemon thread
+	thread.start()
+	LogMsg("background thread waiting for char data to become available")
 
 def UnequipItem(item):
 	# find an empty slot
@@ -1061,10 +1102,11 @@ def GetNPCUniqueID(name):
 	return 0
 # ______________________________ Events _____________________________________ #
 def joined_game():
-	LoadConfig() # this almost never works because char data is usually not avaiable here!
+	LogMsg("waiting for char data in background thread")
+	load_char_data_inbackground() #this will ensure char data gets loaded even if the char_data is not available at the moment.
+	
 
 def teleported():
-	LoadConfig() #best place to get char data. so load the config after teleportation.
 	if(glb_registered_for_styria): #handles autostyria stopping condition 
 		currentProfile = get_profile()
 		if(currentProfile == pName): #only care when profile is in autostyria
@@ -1099,11 +1141,12 @@ def finished():
 def CharInGame():
 	global glb_char_data
 	character_data = get_character_data()
-	if(character_data is None): #only update if the character data is none.
-		LogMsg("char data doesn't exist! trying to retrive from bot")
-		if not (character_data and "name" in character_data and character_data["name"]):
-			character_data = None
+	if character_data and "name" in character_data and character_data["name"]:
+		LogMsg("char data is available")
 		glb_char_data = character_data
+	else:
+		glb_char_data = None
+		LogMsg("char data doesn't exist! trying to retrieve from bot")
 	return character_data
 
 def getPath():
@@ -1197,6 +1240,7 @@ def SaveConfigIfJoined():
 			f.write(json.dumps(data, indent=4, sort_keys=True))
 
 
+
 # Plugin loaded
 LogMsg(f'Plugin: {pName} v{pVersion} succesfully loaded')
-LoadConfig() #ensure config is loaded if user presses refresh button in plugin window
+LoadConfig() #makes sure the plugin interface gets updated when refresh is pressed in plugins section of the bot
