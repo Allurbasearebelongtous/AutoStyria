@@ -319,6 +319,7 @@ def validate_time_string(time_str):
 
 
 #________________________________profile.Json file generation___________________________#
+
 # Helper: Convert HH:MM to total minutes
 def time_to_minutes(tstr):
     t = time.strptime(tstr, "%H:%M")
@@ -360,6 +361,19 @@ def make_preparation_condition(day_enum, time_str,time_end, enabled):
         ]
 	}
 
+def make_single_op_preparation_condition(day_enum, time,is_start, enabled):
+    return {
+        "Enabled": enabled,
+        "if": [
+            {"if": day_enum.value, "op": 2, "value_1": "", "value_2": ""},
+            {"if": 47, "op": 1 if is_start else 4, "value_1": time, "value_2": ""}
+        ],
+        "then": [
+            {"then": 17, "value": "autostyria_prepare", "value_2": ""}
+        ]
+	}
+
+
 def has_autostyria_condition(conditions):
     for cond in conditions:
         for action in cond.get("then", []):
@@ -378,6 +392,19 @@ def get_selected_day(checkbox_by_day):
         if QtBind.isChecked(gui, checkbox):
             return day
     return None  # If no checkbox is selected
+
+def get_previous_day(current_day_enum):
+    if current_day_enum == CONDITION_DAY_TYPE.SUNDAY:
+        return CONDITION_DAY_TYPE.SATURDAY
+    else:
+        return CONDITION_DAY_TYPE(current_day_enum.value - 1)
+	
+def get_next_day(current_day_enum):
+    if current_day_enum == CONDITION_DAY_TYPE.SATURDAY:
+        return CONDITION_DAY_TYPE.SUNDAY
+    else:
+        return CONDITION_DAY_TYPE(current_day_enum.value + 1)
+	
 
 #preparation can happen if the bot logs in after the registration time.
 #or if there is not enough time to prepare before the registration time.
@@ -455,8 +482,15 @@ def generate_autostyria_conditions():
 	day1 = get_selected_day(glb_checkbox_by_day1)
 	day2 = get_selected_day(glb_checkbox_by_day2)
     # Define the prepare conditions.
+	prep_condition_day1_b = None
+	prep_condition_day2_b = None
 	if (day1 is not None):
-		prep_condition_day1 = make_preparation_condition(day1, preparation_time_start,preparation_time_end, True)
+		if(preparation_time_start < "23:50"):
+			prep_condition_day1 = make_preparation_condition(day1, preparation_time_start,preparation_time_end, True)
+		else:
+			prep_condition_day1 = make_single_op_preparation_condition(get_previous_day(day1), preparation_time_start,True, True)
+			prep_condition_day1_b = make_single_op_preparation_condition(day1, preparation_time_end,False, True)
+
 		entry_condition_day1 = make_entry_condition(day1, entry_time_start, False)
 	    #complete_condition_day1 = make_complete_condition(CONDITION_DAY_TYPE.FRIDAY, completion_time, False)
 	else:
@@ -464,7 +498,12 @@ def generate_autostyria_conditions():
 		return
 
 	if (day2 is not None):
-		prep_condition_day2 = make_preparation_condition(day2, preparation_time_start,preparation_time_end, True)
+		if(preparation_time_start < "23:50"):
+			prep_condition_day2 = make_preparation_condition(day2, preparation_time_start,preparation_time_end, True)
+		else:
+			prep_condition_day2 = make_single_op_preparation_condition(get_previous_day(day2), preparation_time_start,True, True)
+			prep_condition_day2_b = make_single_op_preparation_condition(day2, preparation_time_end,False, True)
+
 		entry_condition_day2 = make_entry_condition(day2, entry_time_start, False)
 	    #complete_condition_day2 = make_complete_condition(CONDITION_DAY_TYPE.SATURDAY, completion_time, False)
 	else:
@@ -485,8 +524,12 @@ def generate_autostyria_conditions():
 
 	# Insert conditions if they dont exist
 	original_data["Conditions"].append(prep_condition_day1)
+	if(prep_condition_day1_b is not None):
+		original_data["Conditions"].append(prep_condition_day1_b)
 	LogMsg(f"preparation condition for styria day 1 added in to profile {glb_training_profile}")
 	original_data["Conditions"].append(prep_condition_day2)
+	if(prep_condition_day2_b is not None):
+		original_data["Conditions"].append(prep_condition_day2_b)
 	LogMsg(f"preparation condition for styria day 2 added in to profile {glb_training_profile}")
 
 	# Replace the conditions with an empty one if it exists. this ensures no conditions are passed from copied json profile.
