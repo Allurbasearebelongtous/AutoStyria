@@ -212,7 +212,7 @@ gui_day2_checkbox_fri = QtBind.createCheckBox(gui, 'cbxFrib_clicked','Fri', gui_
 gui_day2_checkbox_sat = QtBind.createCheckBox(gui, 'cbxSatb_clicked','Sat', gui_day2_label_x, gui_day_sat_y)
 gui_day2_checkbox_sun = QtBind.createCheckBox(gui, 'cbxSunb_clicked','Sun', gui_day2_label_x, gui_day_sun_y)
 
-btnLoadConfig = QtBind.createButton(gui,'LoadConfigIfJoined',"   load config    ",gui_window_padding_x,280)
+btnLoadConfig = QtBind.createButton(gui,'LoadConfig',"   load config    ",gui_window_padding_x,280)
 btnSaveConfig = QtBind.createButton(gui,'SaveConfigIfJoined',"   save config    ",gui_window_padding_x + 100,280)
 
 glb_checkbox_by_day1 = {
@@ -1052,6 +1052,7 @@ def teleported():
 					LogMsg(f"while in styria unknown styria or town region ID {region} detected during teleport! More likely you manually quit the Styria! or your bot is using return scroll for some reason!")
 
 def finished():
+
 	LogMsg("#signal the background thread to finish.")
 	glb_stop_event.set()
 
@@ -1059,9 +1060,11 @@ def finished():
 
 def CharInGame():
 	global character_data
-	character_data = get_character_data()
-	if not (character_data and "name" in character_data and character_data["name"]):
-		character_data = None
+	if(character_data is None): #only update if the character data is none.
+		LogMsg("char data doesn't exist! trying to retrive from bot")
+		character_data = get_character_data()
+		if not (character_data and "name" in character_data and character_data["name"]):
+			character_data = None
 	return character_data
 
 def getPath():
@@ -1072,11 +1075,14 @@ def getConfig():
 	global glb_char_data
 	if(glb_char_data is None):
 		glb_char_data = get_character_data()
-
-	return getPath() + pName + '_' + glb_char_data['server'] + '_' + glb_char_data['name'] + '.json'
+	
+	path = getPath() + pName + '_' + glb_char_data['server'] + '_' + glb_char_data['name'] + '.json'
+	LogMsg(f"getConfig(): {path}")
+	return path
 
 # Load config if exists
 def LoadConfig():
+	LogMsg("loading config")
 	if(CharInGame):
 		if not os.path.exists(getPath()):
 			os.makedirs(getPath())
@@ -1155,3 +1161,4 @@ def SaveConfigIfJoined():
 
 # Plugin loaded
 LogMsg(f'Plugin: {pName} v{pVersion} succesfully loaded')
+LoadConfig() #ensure config is loaded if user presses refresh button in plugin window
