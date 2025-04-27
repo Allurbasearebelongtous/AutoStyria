@@ -1164,7 +1164,7 @@ def getConfig():
 
 # Load config if exists
 def LoadConfig():
-	if(CharInGame):
+	if(CharInGame()):
 		if not os.path.exists(getPath()):
 			os.makedirs(getPath())
 			LogMsg(f'Plugin: {pName} folder has been created')
