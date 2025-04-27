@@ -738,6 +738,9 @@ async def async_unequipJobItem():
 
 async def async_autostyria_prepare():
 
+	LogMsg("Waiting for 1 min..reason for this to ensure  bot does all the return town, start bot tasks etc to cover cases on reboot")
+	await async_task_with_sleep(60)
+
 	global glb_training_profile
 	glb_training_profile = get_profile()
 	LogMsg(f"storing default profile {glb_training_profile} to be recovered later")	
