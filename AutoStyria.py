@@ -1118,8 +1118,9 @@ def teleported():
 			region = character_data['region']
 			global glb_styria_started
 			if(not glb_styria_started): #check on each teleportation to see if we are in styria region.
-				region_enum = REGION(region)
+				
 				try:
+					region_enum = REGION(region)
 					if region_enum  in {REGION.STYRIA_A1, REGION.STYRIA_A2, REGION.STYRIA_B1, REGION.STYRIA_B2}:
 						LogMsg("Styria region detected! more likely we are in styria world!")
 						glb_styria_started = True
@@ -1127,12 +1128,15 @@ def teleported():
 					LogMsg(f"While waiting for styria, unknown styria or town region ID {region} detected during teleport! Ignore this if you messing around while waiting for styria")
 
 			else: #check on each teleportation to see if we are out of styria region.
-				region_enum = REGION(region)
+
 				try:
+					region_enum = REGION(region)
 					if region_enum not in {REGION.STYRIA_A1, REGION.STYRIA_A2, REGION.STYRIA_B1, REGION.STYRIA_B2}:
 						autostyria_complete() #we are out! styria must be complete!
 						glb_styria_started = False
 				except ValueError:
+					if region_enum not in {REGION.STYRIA_A1, REGION.STYRIA_A2, REGION.STYRIA_B1, REGION.STYRIA_B2}: #covers all the reagons that is not covered on this script.
+						autostyria_complete() #we are out! styria must be complete!
 					LogMsg(f"while in styria unknown styria or town region ID {region} detected during teleport! More likely you manually quit the Styria! or your bot is using return scroll for some reason!")
 
 def finished():
