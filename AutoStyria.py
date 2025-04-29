@@ -17,7 +17,7 @@ from binascii import hexlify  # for debugging
 
 pName = 'AutoStyria'
 logPrefix = pName + '-plugin: '
-pVersion = '1.0.2'
+pVersion = '1.0.3'
 pUrl = 'https://github.com/Allurbasearebelongtous/AutoStyria'
 pUrlEnglish = 'https://github.com/Allurbasearebelongtous/AutoStyria/wiki'
 pUrlTurkish = 'https://github.com/Allurbasearebelongtous/AutoStyria/wiki/Bilgiler'
