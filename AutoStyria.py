@@ -831,7 +831,7 @@ async def async_autostyria_prepare():
 	
 	if(scriptToNPC):
 		LogMsg("walking to npc from the current region")
-		start_script(scriptToNPC)
+		Timer(1.0, start_script, [scriptToNPC]).start() 
 		LogMsg("waiting for 1 minute to script to finish...")
 		await async_task_with_sleep(60)
 		LogMsg("script should finish by now. if not... something is wrong!")
