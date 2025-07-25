@@ -17,7 +17,7 @@ from binascii import hexlify  # for debugging
 
 pName = 'AutoStyria'
 logPrefix = pName + '-plugin: '
-pVersion = '1.0.4'
+pVersion = '1.0.5'
 pUrl = 'https://github.com/Allurbasearebelongtous/AutoStyria'
 pUrlEnglish = 'https://github.com/Allurbasearebelongtous/AutoStyria/wiki'
 pUrlTurkish = 'https://github.com/Allurbasearebelongtous/AutoStyria/wiki/Bilgiler'
@@ -738,6 +738,8 @@ async def async_unequipJobItem():
 
 async def async_autostyria_prepare():
 
+	#try stopping bot
+	success = await async_stop_bot() #this is to ensure if the bot is already on going
 	LogMsg("Waiting for 1 min..reason for this to ensure  bot does all the return town, start bot tasks etc to cover cases on reboot")
 	await async_task_with_sleep(60)
 
@@ -745,7 +747,7 @@ async def async_autostyria_prepare():
 	glb_training_profile = get_profile()
 	LogMsg(f"storing default profile {glb_training_profile} to be recovered later")	
 	#try stopping bot
-	success = await async_stop_bot()
+	success = await async_stop_bot() #this is to ensure if the bot is no longer on going  after a restart.
 
 	#need to modify the autostyria conditions. 
 	configDirectory = get_config_dir()
@@ -1067,7 +1069,7 @@ def GetEmptySlot():
 	items = get_inventory()['items']
 	# check the first empty
 	for slot, item in enumerate(items):
-		if slot >= 13:
+		if slot >= 17:
 			if not item:
 				return slot
 	return -1
@@ -1142,7 +1144,6 @@ def teleported():
 def finished():
 	LogMsg("#signal the background thread to finish.")
 	glb_stop_event.set()
-
 #______________________________config methods________________________________#
 
 def CharInGame():
